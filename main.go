@@ -32,6 +32,7 @@ var (
 
 	debug   = flag.Bool("debug", false, "Display debug logging.")
 	version = flag.Bool("version", false, "Display version information and exit.")
+	listen  = flag.String("listen", ":8080", "Listen adress.")
 )
 
 type server struct {
@@ -65,7 +66,7 @@ func main() {
 	h := handlers.RecoveryHandler(handlers.PrintRecoveryStack(true))(handlers.CombinedLoggingHandler(os.Stdout, s.router))
 	srv := &http.Server{
 		Handler:      h,
-		Addr:         ":8000",
+		Addr:         *listen,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
