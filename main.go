@@ -33,6 +33,8 @@ var (
 	debug   = flag.Bool("debug", false, "Display debug logging.")
 	version = flag.Bool("version", false, "Display version information and exit.")
 	listen  = flag.String("listen", ":8080", "Listen adress.")
+
+	CommandLineArgs = []string{}
 )
 
 type server struct {
@@ -57,6 +59,9 @@ func main() {
 		log.Debug("debug logging enabled")
 	}
 
+	CommandLineArgs = flag.Args()
+	log.Debugf("args: %+v", CommandLineArgs)
+
 	s := server{
 		router: mux.NewRouter(),
 	}
@@ -78,6 +83,7 @@ func (s *server) routes() {
 	s.router.Handle("/metrics", promhttp.Handler())
 
 	api := s.router.PathPrefix("/v1/test").Subrouter()
+	api.HandleFunc("/args", s.argHandler)
 	api.HandleFunc("/env", s.envHandler)
 	api.HandleFunc("/metadata/task", s.metadataTaskHandler)
 	api.HandleFunc("/metadata/stats", s.metadataStatsHandler)
@@ -191,6 +197,28 @@ func (s *server) pingPongHandler(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	if _, err := io.WriteString(w, "pong"); err != nil {
+		log.Errorf("error writing: %s", err)
+	}
+}
+
+func (s server) argHandler(w http.ResponseWriter, req *http.Request) {
+	log.Debug("argHandler")
+
+	out, err := json.Marshal(struct {
+		Args []string
+	}{
+		Args: CommandLineArgs,
+	})
+	if err != nil {
+		log.Errorf("error marshaling commandlineargs: %s", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(out)
+	if err != nil {
 		log.Errorf("error writing: %s", err)
 	}
 }
