@@ -14,7 +14,6 @@ FROM alpine
 
 WORKDIR /app
 COPY --from=build-env /go/api /app/api
-RUN chmod 555 /app/api
-RUN chown -R nobody:nogroup /app
+RUN chmod 555 /app/api && chown -R nobody:nogroup /app
 USER nobody
 CMD /app/api
