@@ -33,15 +33,15 @@ var (
 
 	debug   = flag.Bool("debug", false, "Display debug logging.")
 	version = flag.Bool("version", false, "Display version information and exit.")
-	listen  = flag.String("listen", ":8080", "Listen adress.")
 
 	CommandLineArgs = []string{}
 )
 
 type server struct {
-	router    *mux.Router
-	volEnable bool
-	volPath   string
+	router     *mux.Router
+	volEnable  bool
+	volPath    string
+	listenPort uint16
 }
 
 func vers() {
@@ -75,7 +75,7 @@ func main() {
 	h := handlers.RecoveryHandler(handlers.PrintRecoveryStack(true))(handlers.CombinedLoggingHandler(os.Stdout, s.router))
 	srv := &http.Server{
 		Handler:      h,
-		Addr:         *listen,
+		Addr:         fmt.Sprintf(":%s", strconv.Itoa(int(s.listenPort))),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
@@ -84,6 +84,16 @@ func main() {
 }
 
 func (s *server) configure() {
+	s.listenPort = 8080
+	if listenPort, ok := os.LookupEnv("LISTEN_PORT"); ok {
+		lp, err := strconv.ParseUint(listenPort, 10, 16)
+		if err != nil {
+			log.Errorf("LISTEN_PORT value '%s' is not a valid integer: %s", listenPort, err)
+		} else {
+			s.listenPort = uint16(lp)
+		}
+	}
+
 	if volEnable, ok := os.LookupEnv("VOLUME_ENABLE"); ok {
 		ve, err := strconv.ParseBool(volEnable)
 		if err != nil {
