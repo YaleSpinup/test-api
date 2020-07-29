@@ -39,9 +39,10 @@ var (
 )
 
 type server struct {
-	router    *mux.Router
-	volEnable bool
-	volPath   string
+	listenAddr string
+	router     *mux.Router
+	volEnable  bool
+	volPath    string
 }
 
 func vers() {
@@ -75,7 +76,7 @@ func main() {
 	h := handlers.RecoveryHandler(handlers.PrintRecoveryStack(true))(handlers.CombinedLoggingHandler(os.Stdout, s.router))
 	srv := &http.Server{
 		Handler:      h,
-		Addr:         *listen,
+		Addr:         s.listenAddr,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
@@ -84,6 +85,11 @@ func main() {
 }
 
 func (s *server) configure() {
+	s.listenAddr = *listen
+	if listenAddr, ok := os.LookupEnv("LISTEN_ADDR"); ok {
+		s.listenAddr = listenAddr
+	}
+
 	if volEnable, ok := os.LookupEnv("VOLUME_ENABLE"); ok {
 		ve, err := strconv.ParseBool(volEnable)
 		if err != nil {
