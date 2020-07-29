@@ -89,6 +89,7 @@ func (s *server) configure() {
 	if listenAddr, ok := os.LookupEnv("LISTEN_ADDR"); ok {
 		s.listenAddr = listenAddr
 	}
+	log.Debugf("listening on %s", s.listenAddr)
 
 	if volEnable, ok := os.LookupEnv("VOLUME_ENABLE"); ok {
 		ve, err := strconv.ParseBool(volEnable)
@@ -99,10 +100,17 @@ func (s *server) configure() {
 		}
 	}
 
+	if s.volEnable {
+		log.Debug("enabling support for volumes")
+	} else {
+		log.Debug("disabling support for volumes")
+	}
+
 	s.volPath = "uploads"
 	if volPath, ok := os.LookupEnv("VOLUME_PATH"); ok {
 		s.volPath = volPath
 	}
+	log.Debugf("set volume path to '%s'", s.volPath)
 }
 
 func (s *server) routes() {
