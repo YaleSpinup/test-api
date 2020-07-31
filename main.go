@@ -39,9 +39,10 @@ var (
 )
 
 type server struct {
-	router    *mux.Router
-	volEnable bool
-	volPath   string
+	listenAddr string
+	router     *mux.Router
+	volEnable  bool
+	volPath    string
 }
 
 func vers() {
@@ -75,7 +76,7 @@ func main() {
 	h := handlers.RecoveryHandler(handlers.PrintRecoveryStack(true))(handlers.CombinedLoggingHandler(os.Stdout, s.router))
 	srv := &http.Server{
 		Handler:      h,
-		Addr:         *listen,
+		Addr:         s.listenAddr,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
@@ -84,6 +85,12 @@ func main() {
 }
 
 func (s *server) configure() {
+	s.listenAddr = *listen
+	if listenAddr, ok := os.LookupEnv("LISTEN_ADDR"); ok {
+		s.listenAddr = listenAddr
+	}
+	log.Debugf("listening on %s", s.listenAddr)
+
 	if volEnable, ok := os.LookupEnv("VOLUME_ENABLE"); ok {
 		ve, err := strconv.ParseBool(volEnable)
 		if err != nil {
@@ -93,10 +100,17 @@ func (s *server) configure() {
 		}
 	}
 
+	if s.volEnable {
+		log.Debug("enabling support for volumes")
+	} else {
+		log.Debug("disabling support for volumes")
+	}
+
 	s.volPath = "uploads"
 	if volPath, ok := os.LookupEnv("VOLUME_PATH"); ok {
 		s.volPath = volPath
 	}
+	log.Debugf("set volume path to '%s'", s.volPath)
 }
 
 func (s *server) routes() {

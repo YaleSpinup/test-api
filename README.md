@@ -19,6 +19,16 @@ A super simple, very basic, hacked together test api (for testing).
 [POST /v1/test/upload](upload-files)  
 [GET /v1/test/version]()  
 
+### Environment variables used for configuration
+
+The following environment variables can be used to configure the `test-api` at runtime.
+
+| Variable      | Default Value | Description                                                                |
+|---------------|---------------|----------------------------------------------------------------------------|
+| LISTEN_ADDR   | `:8080`       | Set the listen address as `IP:PORT`, `:PORT` will listen on all interfaces |
+| VOLUME_ENABLE | `false`       | Set to `true` to enable volume access                                      |
+| VOLUME_PATH   | `uploads`     | Set the filesystem path for volume access                                  |
+
 ### Get Command Line Arguments
 
 Returns the command line arguments as JSON.
