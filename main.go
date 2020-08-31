@@ -12,6 +12,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gomarkdown/markdown"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -128,6 +129,7 @@ func (s *server) routes() {
 	api.HandleFunc("/routes", s.routesHandler)
 	api.HandleFunc("/status", s.statusHandler)
 	api.HandleFunc("/version", s.versionHandler)
+	api.HandleFunc("/readme", s.readmeHandler)
 
 	// if volumes are enabled, create upload and liste endpoints
 	if s.volEnable {
@@ -491,4 +493,23 @@ func humanizeByteSize(b int64) string {
 		exp++
 	}
 	return fmt.Sprintf("%.1f %cB", float64(b)/float64(div), "kMGTPE"[exp])
+}
+
+func (s *server) readmeHandler(w http.ResponseWriter, req *http.Request) {
+	log.Debug("readmeHandler")
+
+	readme, err := ioutil.ReadFile("README.md")
+	if err != nil {
+		msg := fmt.Sprintf("error reading readme: %s", err)
+		log.Errorf(msg)
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte(msg))
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	w.WriteHeader(http.StatusOK)
+	if _, err = w.Write(markdown.ToHTML(readme, nil, nil)); err != nil {
+		log.Errorf("error writing: %s", err)
+	}
 }
