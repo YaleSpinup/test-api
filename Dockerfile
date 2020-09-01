@@ -1,5 +1,11 @@
 # build stage
 FROM golang:alpine AS build-env
+
+ARG version="0.0.0"
+ARG prerelease=""
+ARG githash=""
+ARG buildstamp=""
+
 RUN apk add --no-cache git gcc musl-dev
 
 RUN mkdir /app
@@ -7,7 +13,7 @@ WORKDIR /app
 COPY go.mod .
 RUN go mod download
 COPY . .
-RUN go build -trimpath -o /go/api *.go
+RUN go build -trimpath -o /go/api -ldflags="-X main.Version=$version -X main.VersionPrerelease=$prerelease -X main.Githash=$githash -X main.Buildstamp=$buildstamp" *.go
 
 # final stage
 FROM alpine
