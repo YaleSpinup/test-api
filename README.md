@@ -1,5 +1,9 @@
 # test-api
 
+[![license](https://img.shields.io/github/license/YaleSpinup/test-api)](https://opensource.org/licenses/AGPL-3.0)
+[![go-mod](https://img.shields.io/github/go-mod/go-version/YaleSpinup/test-api)](https://github.com/YaleSpinup/test-api)
+[![go-doc](https://godoc.org/github.com/YaleSpinup/test-api?status.svg)](http://godoc.org/github.com/YaleSpinup/test-api)
+
 A super simple, very basic, hacked together test api (for testing).
 
 ## Endpoints
@@ -14,6 +18,7 @@ A super simple, very basic, hacked together test api (for testing).
 [GET /v1/test/mirror]()  
 [GET /v1/test/panic]()  
 [GET /v1/test/ping]()  
+[GET /v1/test/readme](display-readme)  
 [GET /v1/test/routes]()  
 [GET /v1/test/status{?code=XXX}]()  
 [POST /v1/test/upload](upload-files)  
@@ -79,6 +84,10 @@ Returns a list of files in the VOLUME_PATH
     ]
 }
 ```
+
+### Display Readme
+
+GET this README as html
 
 ### Upload Files
 
