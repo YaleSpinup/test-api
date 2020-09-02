@@ -23,9 +23,6 @@ var (
 	// Version is the main version number
 	Version = "0.0.0"
 
-	// VersionPrerelease is a prerelease marker
-	VersionPrerelease = ""
-
 	// Buildstamp is the timestamp the binary was built, it should be set at buildtime with ldflags
 	Buildstamp = "No BuildStamp Provided"
 
@@ -47,7 +44,7 @@ type server struct {
 }
 
 func vers() {
-	fmt.Printf("Test-API Version: %s%s\n", Version, VersionPrerelease)
+	fmt.Printf("Test-API Version: %s\n", Version)
 	os.Exit(0)
 }
 
@@ -57,7 +54,7 @@ func main() {
 		vers()
 	}
 
-	log.Infof("Starting Test-API version %s%s", Version, VersionPrerelease)
+	log.Infof("Starting Test-API version %s", Version)
 
 	if *debug {
 		log.SetLevel(log.DebugLevel)
@@ -288,10 +285,9 @@ func (s *server) versionHandler(w http.ResponseWriter, req *http.Request) {
 
 	version := struct {
 		Version    string
-		PreRelease string
 		Buildstamp string
 		Githash    string
-	}{Version, VersionPrerelease, Buildstamp, Githash}
+	}{Version, Buildstamp, Githash}
 
 	out, err := json.Marshal(version)
 	if err != nil {
