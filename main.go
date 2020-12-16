@@ -324,6 +324,7 @@ func (s *server) metadataTaskHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_, err = io.Copy(w, out.Body)
 	if err != nil {
@@ -351,6 +352,7 @@ func (s *server) metadataStatsHandler(w http.ResponseWriter, req *http.Request) 
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_, err = io.Copy(w, out.Body)
 	if err != nil {
@@ -377,6 +379,7 @@ func (s *server) metadataTaskStatsHandler(w http.ResponseWriter, req *http.Reque
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_, err = io.Copy(w, out.Body)
 	if err != nil {
