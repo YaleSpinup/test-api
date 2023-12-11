@@ -15,7 +15,7 @@ COPY . .
 RUN go build -trimpath -o /go/api -ldflags="-X main.Version=$version -X main.Githash=$githash -X main.Buildstamp=$buildstamp" *.go
 
 # final stage
-FROM alpine
+FROM build-env
 
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
   CMD wget -qO- localhost:8080/v1/test/ping || exit 1
